@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last.fm Music Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Top Artists on Last.fm</h1>
+    <div class="controls">
+        <button id="fetchData">Load Top Artists</button>
+    </div>
+    <div class="chart-container">
+        <canvas id="musicChart"></canvas>
+    </div>
+
+    <script>
+        let chartInstance;
+
+        async function fetchMusicData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/top-artists');
+                
+                // Проверка успешности ответа
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.message);
+                }
+
+                const artists = data.artists.artist;
+                const labels = artists.slice(0, 10).map(artist => artist.name);
+                const values = artists.slice(0, 10).map(artist => parseInt(artist.playcount));
+
+                // Уничтожаем предыдущий график, если он существует
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                const ctx = document.getElementById('musicChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Playcount',
+                            data: values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true },
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching music data:', error.message);
+                alert('Failed to fetch music data.');
+            }
+        }
+
+        document.getElementById('fetchData').addEventListener('click', fetchMusicData);
+    </script>
+</body>
+</html>

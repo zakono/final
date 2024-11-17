@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .pie-chart {
+            max-width: 1500px; /* Уменьшенный размер для Pie Chart */
+            max-height: 1500px;
+        }
+
+        .default-chart {
+            width: 100%; /* Полный размер для Bar и Line */
+            max-width: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stock Data Visualization</h1>
+    <div class="controls">
+        <label for="stockSymbol">Select Stock:</label>
+        <select id="stockSymbol">
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="GOOGL">Google (GOOGL)</option>
+            <option value="MSFT">Microsoft (MSFT)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+        </select>
+
+        <label for="chartType">Select Chart Type:</label>
+        <select id="chartType">
+            <option value="bar">Bar Chart</option>
+            <option value="line">Line Chart</option>
+            <option value="pie">Pie Chart</option>
+        </select>
+
+        <button id="fetchData">Fetch Data</button>
+    </div>
+
+    <canvas id="stockChart"></canvas>
+
+    <script>
+        let chartInstance;
+
+        document.getElementById('fetchData').addEventListener('click', async () => {
+            const symbol = document.getElementById('stockSymbol').value;
+            const chartType = document.getElementById('chartType').value;
+
+            try {
+                const response = await fetch(`/api/stock/${symbol}`);
+                const data = await response.json();
+
+                const labels = ['Open', 'High', 'Low', 'Current', 'Previous Close'];
+                const values = [data.o, data.h, data.l, data.c, data.pc];
+
+                const canvas = document.getElementById('stockChart');
+                const ctx = canvas.getContext('2d');
+
+                // Меняем класс Canvas в зависимости от типа графика
+                if (chartType === 'pie') {
+                    canvas.className = 'pie-chart';
+                } else {
+                    canvas.className = 'default-chart';
+                }
+
+                // Уничтожаем предыдущий график, если он есть
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: `${symbol} Stock Data`,
+                            data: values,
+                            backgroundColor: chartType === 'pie' ? 
+                                ['#3498db', '#1abc9c', '#f39c12', '#e74c3c', '#9b59b6'] : 
+                                'rgba(52, 152, 219, 0.6)',
+                            borderColor: chartType !== 'pie' ? '#2980b9' : null,
+                            borderWidth: chartType !== 'pie' ? 1 : 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching stock data:', error);
+                alert('Failed to fetch stock data.');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+

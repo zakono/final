@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <script src="signup.js" defer></script>
+</head>
+<body>
+    <h2>Register</h2>
+    <form id="registerForm">
+        <label>Username:</label><br>
+        <input type="text" id="username" required><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" id="email" required><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" id="password" required><br><br>
+
+        <label>First Name:</label><br>
+        <input type="text" id="firstName" required><br><br>
+
+        <label>Last Name:</label><br>
+        <input type="text" id="lastName" required><br><br>
+
+        <label>Age:</label><br>
+        <input type="number" id="age" required><br><br>
+
+        <label>Gender:</label><br>
+        <select id="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select><br><br>
+
+        <label>Role:</label><br>
+        <select id="role">
+            <option value="admin">Admin</option>
+            <option value="editor">Editor</option>
+        </select><br><br>
+
+        <label>Enable Two-Factor Authentication:</label>
+        <input type="checkbox" id="twoFA"><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
+
+
